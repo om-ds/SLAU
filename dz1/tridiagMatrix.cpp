@@ -1,5 +1,6 @@
 #include <iostream>
 #include <array>
+#include <cmath>
 using namespace std;
 
 template<typename T, size_t N>
@@ -106,14 +107,14 @@ public:
 
 int main()
 {
-    array<int, 3> L = {2, 3, 4};
-    array<int, 4> M = {4, 5, 6, 7};
-    array<int, 3> U = {1, 1, 1};
-    array<int, 4> D = {5, 8, 10, 11};
+    array<double, 3> L = {2, 3, 4};
+    array<double, 4> M = {4, 5, 6, 0};
+    array<double, 3> U = {1, 1, 1};
+    array<double, 4> D = {5, 8, 10, 11};
 
-    tridiagMatrix<int, 4> test(L, M, U);
+    tridiagMatrix<double, 4> test(L, M, U);
 
-    array<int, 4> ans = test.ThomasMethod(D);
+    array<double, 4> ans = test.ThomasMethod(D);
 
     for (int i = 0; i < ans.size(); i++)
     {
