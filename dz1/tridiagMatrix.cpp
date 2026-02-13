@@ -47,7 +47,39 @@ public:
         }
     }
 
-    array<T, N> ThomasMethod(array<T, N> d)
+    void print()
+    {
+        if (a.size() != 0 )
+        {
+            cout << "Lower: " << a[0];
+            for (int i = 1; i < a.size(); i++)
+            {
+                cout << "; " << a[i];
+            }
+            cout << endl;
+
+            cout << "Main: " << b[0];
+            for (int i = 1; i < b.size(); i++)
+            {
+                cout << "; " << b[i];
+            }
+            cout << endl;
+
+            cout << "Upper: " << c[0];
+            for (int i = 1; i < c.size(); i++)
+            {
+                cout << "; " << c[i];
+            }
+            cout << endl;
+        }
+
+        else
+        {
+            cout << "Main: " << b[0] << endl;
+        }
+    }
+
+    array<T, N> ThomasAlgorithm(array<T, N> d)
     {
         array<T, N> result;
 
@@ -67,7 +99,7 @@ public:
 
             if (abs(b[i]) < sum)
             {
-                cerr << "Incorrect matrix!";
+                cerr << "Incorrect matrix! Answer can be wrong." << endl;
             }
         }
 
@@ -107,14 +139,16 @@ public:
 
 int main()
 {
+    array<int, 0> siuf = {};
     array<double, 3> L = {2, 3, 4};
-    array<double, 4> M = {4, 5, 6, 0};
+    array<double, 4> M = {4, 5, 6, 7};
     array<double, 3> U = {1, 1, 1};
     array<double, 4> D = {5, 8, 10, 11};
 
     tridiagMatrix<double, 4> test(L, M, U);
+    test.print();
 
-    array<double, 4> ans = test.ThomasMethod(D);
+    array<double, 4> ans = test.ThomasAlgorithm(D);
 
     for (int i = 0; i < ans.size(); i++)
     {
