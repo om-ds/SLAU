@@ -3,7 +3,7 @@ INSTRUCTION:
 mkdir build
 cd build
 
-#no tests:
+#without tests:
 cmake ..
 cmake --build .
 
