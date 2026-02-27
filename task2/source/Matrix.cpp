@@ -44,7 +44,7 @@ public:
         return data[i][j];
     }
 
-    T set(int i, int j, T value)
+    void set(int i, int j, T value)
     {
         data[i][j] = value;
     }
@@ -152,17 +152,14 @@ template<typename T>
 
 std::vector<T> operator* (std::vector<T>& v, T value)
 {
+    std::vector<T> result(v.size(), 0);
+
     for (int i = 0; i < v.size(); i++)
     {
-        std::vector<T> result(v.size(), 0);
-
-        for (int i = 0; i < v.size(); i++)
-        {
-            result[i] = v[i] * value;
-        }
-
-        return result;
+        result[i] = v[i] * value;
     }
+
+    return result;
 }
 
 

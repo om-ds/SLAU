@@ -79,12 +79,12 @@ public:
 
         std::vector<T> result(rows, 0);
 
-        for (int i = 0; i < rows; i++)
+        for (const auto& entry : data)
         {
-            for (int j = 0; j < cols; j++)
-            {
-                result[i] += get(i, j) * v[j];
-            }
+            int i = entry.first.first;
+            int j = entry.first.second;
+            T val = entry.second;
+            result[i] += val * v[j];
         }
 
         return result;
