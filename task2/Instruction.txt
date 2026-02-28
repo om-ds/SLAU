@@ -8,6 +8,6 @@ cmake ..
 cmake --build .
 
 #with tests:
-cmake -DWITH_TESTS=ON
+cmake -DWITH_TESTS=ON ..
 cmake --build .
 ./test_lib
