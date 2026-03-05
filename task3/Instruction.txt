@@ -1,0 +1,13 @@
+INSTRUCTION:
+
+mkdir build
+cd build
+
+#without tests:
+cmake ..
+cmake --build .
+
+#with tests:
+cmake -DWITH_TESTS=ON ..
+cmake --build .
+./test_lib
