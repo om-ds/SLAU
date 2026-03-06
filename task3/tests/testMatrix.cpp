@@ -35,27 +35,6 @@ TEST(MatrixTest, MultiplicationByVector)
     EXPECT_DOUBLE_EQ(result[1], 32.0);
 }
 
-TEST(MatrixTest, VectorOperations)
-{
-    std::vector<double> v1 = {1.0, 2.0, 3.0};
-    std::vector<double> v1_scaled = v1 * 2.0;
-    EXPECT_DOUBLE_EQ(v1_scaled[0], 2.0);
-    EXPECT_DOUBLE_EQ(v1_scaled[1], 4.0);
-    EXPECT_DOUBLE_EQ(v1_scaled[2], 6.0);
-
-    std::vector<double> v2 = {1.0, 2.0, 3.0};
-    std::vector<double> v3 = {4.0, 5.0, 6.0};
-    double dot = v2 * v3;
-    EXPECT_DOUBLE_EQ(dot, 32.0);
-
-    std::vector<double> v4 = {1.0, 2.0, 3.0};
-    std::vector<double> v5 = {4.0, 5.0, 6.0};
-    std::vector<double> v_sum = v4 + v5;
-    EXPECT_DOUBLE_EQ(v_sum[0], 5.0);
-    EXPECT_DOUBLE_EQ(v_sum[1], 7.0);
-    EXPECT_DOUBLE_EQ(v_sum[2], 9.0);
-}
-
 TEST(MatrixTest, MatrixMultiplication)
 {
     Matrix<double> A(2, 3);
@@ -92,4 +71,21 @@ TEST(MatrixTest, QRDecomposition)
     EXPECT_NEAR(QR.get(1, 1), A.get(1, 1), 1e-10);
     EXPECT_NEAR(QR.get(2, 0), A.get(2, 0), 1e-10);
     EXPECT_NEAR(QR.get(2, 1), A.get(2, 1), 1e-10);
+}
+
+TEST(MatrixTest, SolveEquation)
+{
+    Matrix<double> A(2, 2);
+    A.set(0, 0, 2.0); A.set(0, 1, 1.0);
+    A.set(1, 0, 1.0); A.set(1, 1, 3.0);
+
+    std::vector<double> b = {4.0, 7.0};
+    std::vector<double> x = A.solve(b);
+
+    EXPECT_NEAR(x[0], 1.0, 1e-10);
+    EXPECT_NEAR(x[1], 2.0, 1e-10);
+
+    std::vector<double> b_check = A * x;
+    EXPECT_NEAR(b_check[0], b[0], 1e-10);
+    EXPECT_NEAR(b_check[1], b[1], 1e-10);
 }

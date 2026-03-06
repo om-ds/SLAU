@@ -3,6 +3,7 @@
 #include <cmath>
 #include "VectorOperations.hpp"
 
+
 template<typename T>
 class Matrix
 {
@@ -214,5 +215,43 @@ public:
             }
         }
         return std::make_pair(Q, R);
+    }
+
+    std::vector<T> solve(std::vector<T>& b)
+    {
+        if (rows != b.size())
+        {
+            throw std::invalid_argument("Wrong sizes!");
+        }
+        if (rows < cols)
+        {
+            throw std::invalid_argument("Wrong sizes!!");
+        }
+
+        auto res = qr();
+        Matrix<double> Q = res.first;
+        Matrix<double> R = res.second;
+
+        std::vector<T> y(rows, 0);
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < rows; j++)
+            {
+                y[i] += Q.data[j][i] * b[j];
+            }
+        }
+
+        std::vector<T> x(cols, 0);
+        for (int i = cols - 1; i >= 0; i--)
+        {
+            T sum = 0;
+            for (int j = i + 1; j < cols; j++)
+            {
+                sum += R.data[i][j] * x[j];
+            }
+            x[i] = (y[i] - sum) / R.data[i][i];
+        }
+
+        return x;
     }
 };
