@@ -11,6 +11,8 @@ add_library(MATRIX STATIC
     source/Matrix.cpp
     source/SparseMatrix.hpp
     source/SparseMatrix.cpp
+    source/VectorOperations.cpp
+    source/VectorOperations.hpp
 )
 
 target_include_directories(MATRIX PUBLIC
@@ -26,6 +28,7 @@ if(WITH_TESTS)
     set(TEST_SOURCES
         tests/testMatrix.cpp
         tests/testSparseMatrix.cpp
+        tests/testVectorOperations.cpp
     )
 
     add_executable(test_lib ${TEST_SOURCES})

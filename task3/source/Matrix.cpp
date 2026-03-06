@@ -1,16 +1,16 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include "VectorOperations.hpp"
+
 
 template<typename T>
-
 class Matrix
 {
 private:
     int rows;
     int cols;
     std::vector<std::vector<T>> data;
-
 public:
     Matrix(int r, int c) : rows(r), cols(c)
     {
@@ -58,7 +58,6 @@ public:
         }
 
         Matrix result(rows, cols);
-
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < cols; j++)
@@ -78,7 +77,6 @@ public:
         }
 
         Matrix result(rows, cols);
-
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < cols; j++)
@@ -98,7 +96,6 @@ public:
         }
 
         std::vector<T> result(rows, 0);
-
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < cols; j++)
@@ -118,7 +115,6 @@ public:
         }
 
         Matrix<T> result(rows, other.cols);
-
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < other.cols; j++)
@@ -155,19 +151,12 @@ public:
             Q.data[i][i] = T(1);
         }
 
-        int min_dim;
-        if (rows < cols)
-        {
-            min_dim = rows;
-        }
-        else
-        {
-            min_dim = cols;
-        }
+        int min_dim = cols;
 
         for (int k = 0; k < min_dim; k++)
         {
             T norm = 0;
+
             for (int i = k; i < rows; i++)
             {
                 norm += R.data[i][k] * R.data[i][k];
@@ -181,20 +170,15 @@ public:
 
             T sign = (R.data[k][k] >= 0) ? T(1) : T(-1);
             T alpha = -sign * norm;
-
             std::vector<T> v(rows, 0);
             v[k] = R.data[k][k] - alpha;
+
             for (int i = k + 1; i < rows; i++)
             {
                 v[i] = R.data[i][k];
             }
 
-            T v_norm = 0;
-            for (int i = 0; i < rows; i++)
-            {
-                v_norm += v[i] * v[i];
-            }
-            v_norm = std::sqrt(v_norm);
+            T v_norm = std::sqrt(v * v);
 
             if (v_norm == T(0))
             {
@@ -213,6 +197,7 @@ public:
                 {
                     dot += v[i] * R.data[i][j];
                 }
+
                 for (int i = 0; i < rows; i++)
                 {
                     R.data[i][j] = R.data[i][j] - 2 * v[i] * dot;
@@ -221,79 +206,14 @@ public:
 
             for (int i = 0; i < rows; i++)
             {
-                T dot = 0;
-                for (int j = 0; j < rows; j++)
-                {
-                    dot += Q.data[i][j] * v[j];
-                }
+                T dot = Q.data[i] * v;
+
                 for (int j = 0; j < rows; j++)
                 {
                     Q.data[i][j] = Q.data[i][j] - 2 * dot * v[j];
                 }
             }
         }
-
         return std::make_pair(Q, R);
     }
 };
-
-template<typename T>
-
-T operator* (std::vector<T>& a, std::vector<T>& b)
-{
-    if (a.size() != b.size())
-    {
-        throw std::invalid_argument("Wrong sizes!");
-    }
-
-    T result = 0;
-
-    for (int i = 0; i < a.size(); i++)
-    {
-        result += a[i] * b[i];
-    }
-
-    return result;
-}
-
-template<typename T>
-
-std::vector<T> operator+ (std::vector<T>& a, std::vector<T>& b)
-{
-    if (a.size() != b.size())
-    {
-        throw std::invalid_argument("Wrong sizes!");
-    }
-
-    std::vector<T> result(a.size(), 0);
-
-    for (int i = 0; i < a.size(); i++)
-    {
-        result[i] = a[i] + b[i];
-    }
-
-    return result;
-}
-
-template<typename T>
-
-std::vector<T> operator* (std::vector<T>& v, T value)
-{
-    std::vector<T> result(v.size(), 0);
-
-    for (int i = 0; i < v.size(); i++)
-    {
-        result[i] = v[i] * value;
-    }
-
-    return result;
-}
-
-
-/*int main()
-{
-    Matrix<double> A(3, 2);
-    A.input();
-    std::vector<double> v = {1, 2};
-    std::vector<double> ans = A * v;
-}*/

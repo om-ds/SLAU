@@ -46,7 +46,7 @@ TEST(MatrixTest, VectorOperations)
     std::vector<double> v2 = {1.0, 2.0, 3.0};
     std::vector<double> v3 = {4.0, 5.0, 6.0};
     double dot = v2 * v3;
-    EXPECT_DOUBLE_EQ(dot, 32.0); // 1*4 + 2*5 + 3*6 = 32
+    EXPECT_DOUBLE_EQ(dot, 32.0);
 
     std::vector<double> v4 = {1.0, 2.0, 3.0};
     std::vector<double> v5 = {4.0, 5.0, 6.0};

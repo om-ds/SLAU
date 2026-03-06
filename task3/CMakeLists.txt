@@ -9,6 +9,8 @@ option(WITH_TESTS "Enable building tests with Google Test" OFF)
 add_library(MATRIX STATIC
     source/Matrix.hpp
     source/Matrix.cpp
+    source/VectorOperations.cpp
+    source/VectorOperations.hpp
 )
 
 target_include_directories(MATRIX PUBLIC
@@ -23,6 +25,7 @@ if(WITH_TESTS)
 
     set(TEST_SOURCES
         tests/testMatrix.cpp
+        tests/testVectorOperations.cpp
     )
 
     add_executable(test_lib ${TEST_SOURCES})
