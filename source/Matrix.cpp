@@ -217,7 +217,7 @@ public:
         return std::make_pair(Q, R);
     }
 
-    std::vector<T> SolveQR(std::vector<T>& b)
+    std::vector<T> solveQR(std::vector<T>& b)
     {
         if (rows != b.size())
         {

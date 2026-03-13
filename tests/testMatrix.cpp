@@ -80,7 +80,7 @@ TEST(MatrixTest, SolveEquation)
     A.set(1, 0, 1.0); A.set(1, 1, 3.0);
 
     std::vector<double> b = {4.0, 7.0};
-    std::vector<double> x = A.SolveQR(b);
+    std::vector<double> x = A.solveQR(b);
 
     EXPECT_NEAR(x[0], 1.0, 1e-10);
     EXPECT_NEAR(x[1], 2.0, 1e-10);

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "VectorOperations.hpp"
 
 template<typename T>
 
@@ -147,5 +148,159 @@ public:
             }
         }
         return result;
+    }
+
+    std::vector<T> solveSimpleIteration(std::vector<T>& b, int maxIterations = 1000, T tolerance = T(1e-6))
+    {
+        if ((rows != cols) or (b.size() != rows))
+        {
+            throw std::invalid_argument("Wrong sizes!");
+        }
+
+        std::vector<T> x(rows, T(0));
+        std::vector<T> x_new(rows, T(0));
+
+        for (int iter = 0; iter < maxIterations; iter++)
+        {
+            for (int i = 0; i < rows; i++)
+            {
+                x_new[i] = b[i];
+                int start = row_ptr[i];
+                int end = row_ptr[i + 1];
+                for (int k = start; k < end; k++)
+                {
+                    int j = col_indices[k];
+                    T val = values[k];
+                    if (j != i)
+                    {
+                        x_new[i] -= val * x[j];
+                    }
+                }
+
+                T diag = get(i, i);
+                if (diag == T(0))
+                {
+                    throw std::runtime_error("Zero on diagonal!");
+                }
+                x_new[i] /= diag;
+            }
+
+            T diff = T(0);
+            for (int i = 0; i < rows; i++)
+            {
+                diff += std::abs(x_new[i] - x[i]);
+            }
+
+            x = x_new;
+            if (diff < tolerance)
+            {
+                break;
+            }
+        }
+
+        return x;
+    }
+
+    std::vector<T> solveJacobi(std::vector<T>& b, int maxIterations = 1000, T tolerance = T(1e-6))
+    {
+        if ((rows != cols) or (b.size() != rows))
+        {
+            throw std::invalid_argument("Wrong sizes!");
+        }
+
+        std::vector<T> x(rows, T(0));
+        std::vector<T> x_new(rows, T(0));
+
+        for (int iter = 0; iter < maxIterations; iter++)
+        {
+            for (int i = 0; i < rows; i++)
+            {
+                x_new[i] = b[i];
+                int start = row_ptr[i];
+                int end = row_ptr[i + 1];
+                for (int k = start; k < end; k++)
+                {
+                    int j = col_indices[k];
+                    T val = values[k];
+                    if (j != i)
+                    {
+                        x_new[i] -= val * x[j];
+                    }
+                }
+
+                T diag = get(i, i);
+                if (diag == T(0))
+                {
+                    throw std::runtime_error("Zero on diagonal!");
+                }
+                x_new[i] /= diag;
+            }
+
+            T diff = T(0);
+            for (int i = 0; i < rows; i++)
+            {
+                diff += std::abs(x_new[i] - x[i]);
+            }
+
+            x = x_new;
+            if (diff < tolerance)
+            {
+                break;
+            }
+        }
+
+        return x;
+    }
+
+    std::vector<T> solveGaussSeidel(std::vector<T>& b, int maxIterations = 1000, T tolerance = T(1e-6))
+    {
+        if ((rows != cols) or (b.size() != rows))
+        {
+            throw std::invalid_argument("Wrong sizes!");
+        }
+
+        std::vector<T> x(rows, T(0));
+        std::vector<T> x_old = x;
+
+        for (int iter = 0; iter < maxIterations; iter++)
+        {
+            x_old = x;
+
+            for (int i = 0; i < rows; i++)
+            {
+                T sum = b[i];
+                int start = row_ptr[i];
+                int end = row_ptr[i + 1];
+                for (int k = start; k < end; k++)
+                {
+                    int j = col_indices[k];
+                    T val = values[k];
+                    if (j != i)
+                    {
+                        sum -= val * x[j];
+                    }
+                }
+
+                T diag = get(i, i);
+                if (diag == T(0))
+                {
+                    throw std::runtime_error("Zero on diagonal!");
+                }
+                x[i] = sum / diag;
+            }
+
+            T diff = T(0);
+            for (int i = 0; i < rows; i++)
+            {
+                diff += std::abs(x[i] - x_old[i]);
+            }
+
+            if (diff < tolerance)
+            {
+                break;
+            }
+        }
+
+        return x;
     }
 };

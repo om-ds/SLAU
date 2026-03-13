@@ -1,5 +1,6 @@
 #include <vector>
 #include <stdexcept>
+#include <cmath>
 
 template<typename T>
 T operator* (std::vector<T>& a, std::vector<T>& b)
