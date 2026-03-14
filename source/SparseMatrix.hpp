@@ -6,7 +6,7 @@ template<typename T>
 
 class SparseMatrix
 {
-private:
+public:
     int rows;
     int cols;
     std::vector<T> values;
@@ -74,7 +74,6 @@ private:
         }
     }
 
-public:
     SparseMatrix(int r, int c) : rows(r), cols(c)
     {
         row_ptr.resize(rows + 1, 0);
@@ -157,47 +156,34 @@ public:
             throw std::invalid_argument("Wrong sizes!");
         }
 
+        T maxDiag = T(0);
+        for (int i = 0; i < rows; ++i)
+        {
+            T diag = std::abs(get(i, i));
+            if (diag > maxDiag) maxDiag = diag;
+        }
+        T tau = T(1) / maxDiag;
+
         std::vector<T> x(rows, T(0));
-        std::vector<T> x_new(rows, T(0));
 
         for (int iter = 0; iter < maxIterations; iter++)
         {
-            for (int i = 0; i < rows; i++)
-            {
-                x_new[i] = b[i];
-                int start = row_ptr[i];
-                int end = row_ptr[i + 1];
-                for (int k = start; k < end; k++)
-                {
-                    int j = col_indices[k];
-                    T val = values[k];
-                    if (j != i)
-                    {
-                        x_new[i] -= val * x[j];
-                    }
-                }
+            std::vector<T> Ax = (*this) * x;
+            std::vector<T> r = b - Ax;
 
-                T diag = get(i, i);
-                if (diag == T(0))
-                {
-                    throw std::runtime_error("Zero on diagonal!");
-                }
-                x_new[i] /= diag;
-            }
+            std::vector<T> x_new = x + r * tau;
 
             T diff = T(0);
             for (int i = 0; i < rows; i++)
             {
                 diff += std::abs(x_new[i] - x[i]);
             }
-
             x = x_new;
             if (diff < tolerance)
             {
                 break;
             }
         }
-
         return x;
     }
 
