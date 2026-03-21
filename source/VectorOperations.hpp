@@ -20,7 +20,7 @@ T operator* (std::vector<T>& a, std::vector<T>& b)
 }
 
 template<typename T>
-std::vector<T> operator+ (std::vector<T>& a, std::vector<T>& b)
+std::vector<T> operator+ (const std::vector<T>& a, const std::vector<T>& b)
 {
     if (a.size() != b.size())
     {
@@ -31,6 +31,23 @@ std::vector<T> operator+ (std::vector<T>& a, std::vector<T>& b)
     for (int i = 0; i < a.size(); i++)
     {
         result[i] = a[i] + b[i];
+    }
+
+    return result;
+}
+
+template<typename T>
+std::vector<T> operator- (const std::vector<T>& a, const std::vector<T>& b)
+{
+    if (a.size() != b.size())
+    {
+        throw std::invalid_argument("Wrong sizes!");
+    }
+
+    std::vector<T> result(a.size(), 0);
+    for (int i = 0; i < a.size(); i++)
+    {
+        result[i] = a[i] - b[i];
     }
 
     return result;

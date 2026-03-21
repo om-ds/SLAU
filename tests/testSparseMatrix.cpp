@@ -101,3 +101,25 @@ TEST(SparseMatrixTest, SolveGaussSeidel)
     EXPECT_NEAR(ans[1], 0.285714, 1e-6);
     EXPECT_NEAR(ans[2], 0.535714, 1e-6);
 }
+
+TEST(SparseMatrixTest, SolveSimpleIterationChebyshev)
+{
+    SparseMatrix<double> A(3, 3);
+
+    A.set(0, 0, 5);
+    A.set(1, 1, 5);
+    A.set(2, 2, 5);
+    A.set(0, 1, 1);
+    A.set(0, 2, 1);
+    A.set(1, 0, 1);
+    A.set(1, 2, 1);
+    A.set(2, 0, 1);
+    A.set(2, 1, 1);
+
+    std::vector<double> b = {1, 2, 3};
+    std::vector<double> ans = A.solveSimpleIterationChebyshev(b);
+
+    EXPECT_NEAR(ans[0], 0.0357143, 1e-6);
+    EXPECT_NEAR(ans[1], 0.285714, 1e-6);
+    EXPECT_NEAR(ans[2], 0.535714, 1e-6);
+}

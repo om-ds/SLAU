@@ -289,4 +289,112 @@ public:
 
         return x;
     }
+
+    std::vector<T> solveSimpleIterationChebyshev(std::vector<T>& b, int maxIterations = 1000, T tolerance = T(1e-6))
+    {
+        if ((rows != cols) or (b.size() != rows))
+        {
+            throw std::invalid_argument("Wrong sizes!");
+        }
+
+        std::vector<T> v(rows, T(1));
+        T norm = T(0);
+
+        for (int i = 0; i < rows; i++)
+        {
+            norm += v[i] * v[i];
+        }
+        norm = std::sqrt(norm);
+
+        for (int i = 0; i < rows; i++)
+        {
+            v[i] /= norm;
+        }
+        T maxEigen = T(0);
+
+        for (int iter = 0; iter < 50; iter++)
+        {
+            std::vector<T> Av = (*this) * v;
+            maxEigen = T(0);
+
+            for (int i = 0; i < rows; i++)
+            {
+                maxEigen += v[i] * Av[i];
+            }
+            norm = T(0);
+
+            for (int i = 0; i < rows; i++)
+            {
+                norm += Av[i] * Av[i];
+                }
+            norm = std::sqrt(norm);
+
+            if (norm == T(0))
+            {
+                throw std::runtime_error("Zero norm in power method!");
+            }
+
+            for (int i = 0; i < rows; i++)
+            {
+                v[i] = Av[i] / norm;
+            }
+        }
+
+        T minEigen = maxEigen / T(10);
+        if (minEigen <= T(0))
+        {
+            minEigen = maxEigen / T(100);
+        }
+
+        int n = maxIterations;
+        std::vector<int> perm = {0, 1};
+        int m = 2;
+        while (m < n)
+        {
+            std::vector<int> new_perm;
+            for (int idx : perm)
+            {
+                new_perm.push_back(idx);
+                new_perm.push_back(2 * m - 1 - idx);
+            }
+            perm = new_perm;
+            m *= 2;
+        }
+
+        std::vector<T> x(rows, T(0));
+        T theta = T(3.1415) / T(n);
+        T center = (maxEigen + minEigen) / T(2);
+        T halfDiff = (maxEigen - minEigen) / T(2);
+
+        for (int cycle = 0; cycle < 10; cycle++)
+        {
+            for (int iter = 0; iter < n; iter++)
+            {
+                int k = perm[iter % perm.size()];
+                T t_k = std::cos(theta * (T(2) * k + T(1)) / T(2));
+                T t_prime = center + halfDiff * t_k;
+                T tau = T(1) / t_prime;
+
+                std::vector<T> Ax = (*this) * x;
+                std::vector<T> r = b - Ax;
+                for (int i = 0; i < rows; i++)
+                {
+                    x[i] += tau * r[i];
+                }
+            }
+
+            T diff = T(0);
+            std::vector<T> Ax = (*this) * x;
+            for (int i = 0; i < rows; i++)
+            {
+                diff += std::abs(b[i] - Ax[i]);
+            }
+            if (diff < tolerance)
+            {
+                break;
+            }
+        }
+
+        return x;
+    }
 };
