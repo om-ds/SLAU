@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <stdexcept>
+#include <utility>
 #include "VectorOperations.hpp"
 
 template<typename T>
@@ -19,10 +21,7 @@ public:
         int end = row_ptr[row + 1];
         for (int k = start; k < end; k++)
         {
-            if (col_indices[k] == col)
-            {
-                return k;
-            }
+            if (col_indices[k] == col) return k;
         }
         return -1;
     }
@@ -33,10 +32,7 @@ public:
         int end = row_ptr[row + 1];
         for (int k = start; k < end; k++)
         {
-            if (col_indices[k] >= col)
-            {
-                return k;
-            }
+            if (col_indices[k] >= col) return k;
         }
         return end;
     }
@@ -50,8 +46,7 @@ public:
             {
                 values.erase(values.begin() + position);
                 col_indices.erase(col_indices.begin() + position);
-                for (int r = row + 1; r <= rows; r++)
-                    row_ptr[r]--;
+                for (int r = row + 1; r <= rows; r++) row_ptr[r]--;
             }
         }
         int position = findInRow(row, col);
@@ -64,8 +59,7 @@ public:
             int insert_position = findInsertPosition(row, col);
             values.insert(values.begin() + insert_position, value);
             col_indices.insert(col_indices.begin() + insert_position, col);
-            for (int r = row + 1; r <= rows; r++)
-                row_ptr[r]++;
+            for (int r = row + 1; r <= rows; r++) row_ptr[r]++;
         }
     }
 
@@ -104,17 +98,14 @@ public:
     SparseMatrix operator+ (const SparseMatrix& other) const
     {
         if (rows != other.rows or cols != other.cols)
-        {
             throw std::invalid_argument("Wrong sizes!");
-        }
         SparseMatrix<T> result(rows, cols);
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < cols; j++)
             {
                 T val = get(i, j) + other.get(i, j);
-                if (val != T(0))
-                    result.set(i, j, val);
+                if (val != T(0)) result.set(i, j, val);
             }
         }
         return result;
@@ -123,9 +114,7 @@ public:
     std::vector<T> operator* (const std::vector<T>& v) const
     {
         if (static_cast<int>(v.size()) != cols)
-        {
             throw std::invalid_argument("Wrong sizes!");
-        }
         std::vector<T> result(rows, T(0));
         for (int i = 0; i < rows; i++)
         {
@@ -144,12 +133,9 @@ public:
     std::vector<T> solveSimpleIteration(const std::vector<T>& b, int maxIterations = 1000, T tolerance = T(1e-6)) const
     {
         if ((rows != cols) or (b.size() != rows))
-        {
             throw std::invalid_argument("Wrong sizes!");
-        }
         T maxDiag = T(0);
-        for (int i = 0; i < rows; ++i)
-        {
+        for (int i = 0; i < rows; ++i) {
             T diag = std::abs(get(i, i));
             if (diag > maxDiag) maxDiag = diag;
         }
@@ -161,15 +147,9 @@ public:
             std::vector<T> r = b - Ax;
             std::vector<T> x_new = x + r * tau;
             T diff = T(0);
-            for (int i = 0; i < rows; i++)
-            {
-                diff += std::abs(x_new[i] - x[i]);
-            }
+            for (int i = 0; i < rows; i++) diff += std::abs(x_new[i] - x[i]);
             x = x_new;
-            if (diff < tolerance)
-            {
-                break;
-            }
+            if (diff < tolerance) break;
         }
         return x;
     }
@@ -177,9 +157,7 @@ public:
     std::vector<T> solveJacobi(const std::vector<T>& b, int maxIterations = 1000, T tolerance = T(1e-6)) const
     {
         if ((rows != cols) or (b.size() != rows))
-        {
             throw std::invalid_argument("Wrong sizes!");
-        }
         std::vector<T> x(rows, T(0));
         std::vector<T> x_new(rows, T(0));
         for (int iter = 0; iter < maxIterations; iter++)
@@ -193,28 +171,16 @@ public:
                 {
                     int j = col_indices[k];
                     T val = values[k];
-                    if (j != i)
-                    {
-                        x_new[i] -= val * x[j];
-                    }
+                    if (j != i) x_new[i] -= val * x[j];
                 }
                 T diag = get(i, i);
-                if (diag == T(0))
-                {
-                    throw std::runtime_error("Zero on diagonal!");
-                }
+                if (diag == T(0)) throw std::runtime_error("Zero on diagonal!");
                 x_new[i] /= diag;
             }
             T diff = T(0);
-            for (int i = 0; i < rows; i++)
-            {
-                diff += std::abs(x_new[i] - x[i]);
-            }
+            for (int i = 0; i < rows; i++) diff += std::abs(x_new[i] - x[i]);
             x = x_new;
-            if (diff < tolerance)
-            {
-                break;
-            }
+            if (diff < tolerance) break;
         }
         return x;
     }
@@ -222,9 +188,7 @@ public:
     std::vector<T> solveGaussSeidel(const std::vector<T>& b, int maxIterations = 1000, T tolerance = T(1e-6)) const
     {
         if ((rows != cols) or (b.size() != rows))
-        {
             throw std::invalid_argument("Wrong sizes!");
-        }
         std::vector<T> x(rows, T(0));
         std::vector<T> x_old = x;
         for (int iter = 0; iter < maxIterations; iter++)
@@ -239,27 +203,15 @@ public:
                 {
                     int j = col_indices[k];
                     T val = values[k];
-                    if (j != i)
-                    {
-                        sum -= val * x[j];
-                    }
+                    if (j != i) sum -= val * x[j];
                 }
                 T diag = get(i, i);
-                if (diag == T(0))
-                {
-                    throw std::runtime_error("Zero on diagonal!");
-                }
+                if (diag == T(0)) throw std::runtime_error("Zero on diagonal!");
                 x[i] = sum / diag;
             }
             T diff = T(0);
-            for (int i = 0; i < rows; i++)
-            {
-                diff += std::abs(x[i] - x_old[i]);
-            }
-            if (diff < tolerance)
-            {
-                break;
-            }
+            for (int i = 0; i < rows; i++) diff += std::abs(x[i] - x_old[i]);
+            if (diff < tolerance) break;
         }
         return x;
     }
@@ -267,91 +219,52 @@ public:
     std::vector<T> solveSimpleIterationChebyshev(const std::vector<T>& b, int maxIterations = 1000, T tolerance = T(1e-6), int n_roots = 16) const
     {
         if ((rows != cols) or (b.size() != rows))
-        {
             throw std::invalid_argument("Wrong sizes!");
-        }
-
         std::vector<T> x_eig(rows, T(1));
         T lambda_max = T(0);
         T lambda_prev = T(0);
         T pi = T(3.1415926535);
-
         for (int iter = 0; iter < 100; ++iter)
         {
             std::vector<T> Ax = (*this) * x_eig;
-            T numerator = T(0);
-            T denominator = T(0);
-            for (int i = 0; i < rows; ++i)
-            {
+            T numerator = T(0), denominator = T(0);
+            for (int i = 0; i < rows; ++i) {
                 numerator += x_eig[i] * Ax[i];
                 denominator += x_eig[i] * x_eig[i];
             }
-            if (denominator > T(0))
-            {
+            if (denominator > T(0)) {
                 lambda_prev = lambda_max;
                 lambda_max = numerator / denominator;
             }
             T norm = T(0);
-            for (int i = 0; i < rows; ++i)
-            {
-                norm += Ax[i] * Ax[i];
-            }
+            for (int i = 0; i < rows; ++i) norm += Ax[i] * Ax[i];
             norm = std::sqrt(norm);
-            if (norm < T(1e-15))
-                break;
-            for (int i = 0; i < rows; ++i)
-            {
-                x_eig[i] = Ax[i] / norm;
-            }
-            if (std::abs(lambda_max - lambda_prev) < T(1e-10))
-                break;
+            if (norm < T(1e-15)) break;
+            for (int i = 0; i < rows; ++i) x_eig[i] = Ax[i] / norm;
+            if (std::abs(lambda_max - lambda_prev) < T(1e-10)) break;
         }
-
         T lambda_min = lambda_max * T(0.012);
         std::vector<T> x(rows, T(0));
-        int total_iterations = 0;
-
-
-
         for (int cycle = 0; cycle < maxIterations / n_roots; ++cycle)
         {
             std::vector<T> cheb_roots(n_roots);
-
             T theta_0 = pi / T(2 * n_roots);
             T delta = pi / T(n_roots);
-
-            T cos_theta = std::cos(theta_0);
-            T sin_theta = std::sin(theta_0);
-            T cos_delta = std::cos(delta);
-            T sin_delta = std::sin(delta);
-
+            T cos_theta = std::cos(theta_0), sin_theta = std::sin(theta_0);
+            T cos_delta = std::cos(delta), sin_delta = std::sin(delta);
             for (int k = 0; k < n_roots; ++k)
             {
-                cheb_roots[k] = T(0.5) * (lambda_max + lambda_min) +
-                               T(0.5) * (lambda_max - lambda_min) * cos_theta;
-
-                if (k < n_roots - 1)
-                {
+                cheb_roots[k] = T(0.5) * (lambda_max + lambda_min) + T(0.5) * (lambda_max - lambda_min) * cos_theta;
+                if (k < n_roots - 1) {
                     T new_cos = cos_theta * cos_delta - sin_theta * sin_delta;
                     T new_sin = sin_theta * cos_delta + cos_theta * sin_delta;
-                    cos_theta = new_cos;
-                    sin_theta = new_sin;
+                    cos_theta = new_cos; sin_theta = new_sin;
                 }
             }
-
             std::vector<T> permuted_roots(n_roots);
             int left = 0, right = n_roots - 1;
             for (int i = 0; i < n_roots; ++i)
-            {
-                if (i % 2 == 0)
-                {
-                    permuted_roots[i] = cheb_roots[left++];
-                }
-                else
-                {
-                    permuted_roots[i] = cheb_roots[right--];
-                }
-            }
+                permuted_roots[i] = (i % 2 == 0) ? cheb_roots[left++] : cheb_roots[right--];
 
             for (int i = 0; i < n_roots; ++i)
             {
@@ -360,30 +273,193 @@ public:
                 std::vector<T> residual = b - Ax;
                 std::vector<T> x_new = x + residual * tau_i;
                 T diff = T(0);
-                for (int j = 0; j < rows; ++j)
-                {
-                    diff += std::abs(x_new[j] - x[j]);
-                }
+                for (int j = 0; j < rows; ++j) diff += std::abs(x_new[j] - x[j]);
                 x = x_new;
-                total_iterations++;
-                if (diff < tolerance)
-                {
-                    return x;
-                }
-            }
-
-            std::vector<T> Ax = (*this) * x;
-            std::vector<T> residual = b - Ax;
-            T residual_norm = T(0);
-            for (int j = 0; j < rows; ++j)
-            {
-                residual_norm += std::abs(residual[j]);
-            }
-            if (residual_norm < tolerance)
-            {
-                return x;
+                if (diff < tolerance) return x;
             }
         }
         return x;
+    }
+
+    template<typename StepFunc>
+    T estimateRho(StepFunc step, int n_est = 20) const
+    {
+        std::vector<T> x_prev(rows, T(0));
+        std::vector<T> x_curr = step(x_prev);
+        T rho = T(0.95);
+
+        for (int i = 0; i < n_est; ++i)
+        {
+            std::vector<T> x_next = step(x_curr);
+            T norm_curr_sq = T(0), norm_prev_sq = T(0);
+            for (int k = 0; k < rows; ++k)
+            {
+                T d_curr = x_next[k] - x_curr[k];
+                T d_prev = x_curr[k] - x_prev[k];
+                norm_curr_sq += d_curr * d_curr;
+                norm_prev_sq += d_prev * d_prev;
+            }
+            if (norm_prev_sq > T(1e-14))
+                rho = std::sqrt(norm_curr_sq / norm_prev_sq);
+            x_prev = std::move(x_curr);
+            x_curr = std::move(x_next);
+        }
+        if (rho < T(0)) rho = T(0);
+        if (rho >= T(1)) rho = T(0.9999);
+        return rho;
+    }
+
+    template<typename StepFunc>
+    std::vector<T> solveChebyshevAccelerated(StepFunc step, int maxIterations = 1000, T tolerance = T(1e-6)) const
+    {
+        std::vector<T> y_prev(rows, T(0));
+        std::vector<T> y_curr = step(y_prev);
+        std::vector<T> y_next(rows);
+
+        T rho = estimateRho(step);
+        T omega = T(2) / (T(2) - rho * rho);
+        T tol_sq = tolerance * tolerance;
+
+        for (int iter = 1; iter < maxIterations; ++iter)
+        {
+            std::vector<T> step_res = step(y_curr);
+            T diff_sq = T(0);
+            for (int k = 0; k < rows; ++k)
+            {
+                y_next[k] = omega * (step_res[k] - y_prev[k]) + y_prev[k];
+                T d = y_next[k] - y_curr[k];
+                diff_sq += d * d;
+            }
+            if (diff_sq < tol_sq) return y_next;
+
+            std::swap(y_prev, y_curr);
+            std::swap(y_curr, y_next);
+            omega = T(1) / (T(1) - rho * rho * omega / T(4));
+        }
+        return y_curr;
+    }
+
+    std::vector<T> solveJacobiChebyshev(const std::vector<T>& b, int maxIter = 1000, T tol = T(1e-6)) const
+    {
+        std::vector<T> diag(rows);
+        for (int i = 0; i < rows; ++i) {
+            diag[i] = get(i, i);
+            if (diag[i] == T(0)) throw std::runtime_error("Zero on diagonal!");
+        }
+
+        auto step = [&](const std::vector<T>& x) {
+            std::vector<T> xn(rows, T(0));
+            for (int i = 0; i < rows; ++i) {
+                T sum = b[i];
+                int s = row_ptr[i], e = row_ptr[i+1];
+                for (int k = s; k < e; ++k)
+                    if (col_indices[k] != i) sum -= values[k] * x[col_indices[k]];
+                xn[i] = sum / diag[i];
+            }
+            return xn;
+        };
+        return solveChebyshevAccelerated(step, maxIter, tol);
+    }
+
+    std::vector<T> solveGaussSeidelChebyshev(const std::vector<T>& b, int maxIter = 1000, T tol = T(1e-6)) const
+    {
+        std::vector<T> diag(rows);
+        for (int i = 0; i < rows; ++i) {
+            diag[i] = get(i, i);
+            if (diag[i] == T(0)) throw std::runtime_error("Zero on diagonal!");
+        }
+
+        auto step = [&](const std::vector<T>& x) {
+            std::vector<T> xn = x;
+            for (int i = 0; i < rows; ++i) {
+                T sum = b[i];
+                int s = row_ptr[i], e = row_ptr[i+1];
+                for (int k = s; k < e; ++k)
+                    if (col_indices[k] != i) sum -= values[k] * xn[col_indices[k]];
+                xn[i] = sum / diag[i];
+            }
+            return xn;
+        };
+
+        T rho = estimateRho(step);
+        if (rho > T(0.90)) rho = T(0.70);
+
+        std::vector<T> y_prev(rows, T(0));
+        std::vector<T> y_curr = step(y_prev);
+        std::vector<T> y_next(rows);
+
+        T omega = T(2) / (T(2) - rho * rho);
+        T tol_sq = tol * tol;
+
+        for (int iter = 1; iter < maxIter; ++iter)
+        {
+            std::vector<T> step_res = step(y_curr);
+            T diff_sq = T(0);
+            for (int k = 0; k < rows; ++k)
+            {
+                y_next[k] = omega * (step_res[k] - y_prev[k]) + y_prev[k];
+                T d = y_next[k] - y_curr[k];
+                diff_sq += d * d;
+            }
+            if (diff_sq < tol_sq) return y_next;
+
+            std::swap(y_prev, y_curr);
+            std::swap(y_curr, y_next);
+            omega = T(1) / (T(1) - rho * rho * omega / T(4));
+        }
+        return y_curr;
+    }
+
+    std::vector<T> solveSymmetricGaussSeidel(const std::vector<T>& b, int maxIter = 1000, T tol = T(1e-6)) const
+    {
+        std::vector<T> x(rows, T(0));
+        for (int iter = 0; iter < maxIter; ++iter)
+        {
+            std::vector<T> x_half = x;
+            for (int i = 0; i < rows; ++i)
+            {
+                T sum = b[i]; int s = row_ptr[i], e = row_ptr[i+1];
+                for (int k = s; k < e; ++k) if (col_indices[k] != i) sum -= values[k] * x_half[col_indices[k]];
+                x_half[i] = sum / get(i, i);
+            }
+            std::vector<T> x_new = x_half;
+            for (int i = rows - 1; i >= 0; --i)
+            {
+                T sum = b[i]; int s = row_ptr[i], e = row_ptr[i+1];
+                for (int k = s; k < e; ++k) if (col_indices[k] != i) sum -= values[k] * x_new[col_indices[k]];
+                x_new[i] = sum / get(i, i);
+            }
+            T diff = T(0);
+            for (int i = 0; i < rows; ++i) diff += std::abs(x_new[i] - x[i]);
+            x = x_new;
+            if (diff < tol) break;
+        }
+        return x;
+    }
+
+    std::vector<T> solveSymmetricGaussSeidelChebyshev(const std::vector<T>& b, int maxIter = 1000, T tol = T(1e-6)) const
+    {
+        std::vector<T> diag(rows);
+        for (int i = 0; i < rows; ++i) {
+            diag[i] = get(i, i);
+            if (diag[i] == T(0)) throw std::runtime_error("Zero on diagonal!");
+        }
+
+        auto step = [&](const std::vector<T>& x) {
+            std::vector<T> x_half = x;
+            for(int i=0; i<rows; ++i) {
+                T s = b[i]; int s2=row_ptr[i], e=row_ptr[i+1];
+                for(int k=s2; k<e; ++k) if(col_indices[k]!=i) s -= values[k]*x_half[col_indices[k]];
+                x_half[i] = s / diag[i];
+            }
+            std::vector<T> xn = x_half;
+            for(int i=rows-1; i>=0; --i) {
+                T s = b[i]; int s2=row_ptr[i], e=row_ptr[i+1];
+                for(int k=s2; k<e; ++k) if(col_indices[k]!=i) s -= values[k]*xn[col_indices[k]];
+                xn[i] = s / diag[i];
+            }
+            return xn;
+        };
+        return solveChebyshevAccelerated(step, maxIter, tol);
     }
 };
